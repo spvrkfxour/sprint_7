@@ -1,0 +1,5 @@
+firstName,lastName,address,metroStation,phone,rentTime,deliveryDate,comment,color
+Naruto,Uchiha,"Konoha, 142 apt.",4,+7 800 355 35 35,5,2024-06-06,"Saske, come back to Konoha",BLACK
+Sasuke,Uchiha,"Konoha, 143 apt.",5,+7 800 355 35 36,1,2024-06-07,,GRAY
+Hinata,Hyuga,"Konoha, 144 apt.",6,+7 800 355 35 37,10,2024-06-08,"Please be careful",BLACK|GRAY
+Kakashi,Hatake,"Konoha, 145 apt.",7,+7 800 355 35 38,3,2024-06-09,,
