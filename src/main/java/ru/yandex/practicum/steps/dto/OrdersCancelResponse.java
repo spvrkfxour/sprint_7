@@ -1,18 +1,11 @@
 package ru.yandex.practicum.steps.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
+
+@Data
+@AllArgsConstructor
 public class OrdersCancelResponse {
     private int track;
-
-    public OrdersCancelResponse(int track) {
-        this.track = track;
-    }
-
-    public int getTrack() {
-        return track;
-    }
-
-    public void setTrack(int track) {
-        this.track = track;
-    }
 }
