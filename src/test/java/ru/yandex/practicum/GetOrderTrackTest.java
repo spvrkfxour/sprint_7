@@ -1,16 +1,12 @@
 package ru.yandex.practicum;
 
-import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import ru.yandex.practicum.steps.OrderSteps;
-import ru.yandex.practicum.steps.dto.OrdersTrackMainResponse;
+import ru.yandex.practicum.steps.*;
 import ru.yandex.practicum.steps.dto.OrdersTrackResponse;
 
 import java.io.IOException;
@@ -19,12 +15,15 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static ru.yandex.practicum.steps.env.EnvConf.*;
 
 
 public class GetOrderTrackTest {
     private final OrderSteps orderSteps = new OrderSteps();
+    private final StatusCodeSteps statusCode = new StatusCodeSteps();
+    private final CreateOrderSteps createOrder = new CreateOrderSteps();
+    private final GetOrderSteps getOrder = new GetOrderSteps();
+    private final BodySteps body = new BodySteps();
     private static final String[] orderData = orderData();
     private Response response;
     private OrdersTrackResponse orderResponse;
@@ -40,7 +39,7 @@ public class GetOrderTrackTest {
         }
     }
 
-    Response responseOrder = createOrderTest(
+    Response responseOrder = createOrder.createOrderTest(
             orderData[0].replace("\"", ""),
             orderData[1].replace("\"", ""),
             orderData[2].replace("\"", ""),
@@ -58,7 +57,7 @@ public class GetOrderTrackTest {
             throw new RuntimeException("500 Internal Server Error: " + responseOrder.getBody().asString());
         }
         // Количество символов: MIN_COUNT_LENGTH + 7
-        trackId = getTrackIdTest(responseOrder);;
+        trackId = getOrder.getTrackIdTest(responseOrder);;
     }
 
     @Test
@@ -67,39 +66,9 @@ public class GetOrderTrackTest {
     public void getOrderWithTrackIdTest() {
         response = orderSteps.getOrderWithTrack(trackId);
         orderResponse = response.as(OrdersTrackResponse.class);
-        return200Test(response);
-        returnOrderWithSameTrackBodyTest(response);
-        getOrderReturnNotNullDeserializeTest(orderResponse);
-    }
-
-    @Step("Create order")
-    public Response createOrderTest(String firstName, String lastName, String address, int metroStation, String phone,
-                                    int rentTime, String deliveryDate, String comment, List<String> color) {
-        return orderSteps.createOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-    }
-
-    @Step("Get track id")
-    public Integer getTrackIdTest(Response response) {
-        Allure.step("Track id: " + response.then().extract().path("track"));
-        return response.then().extract().path("track");
-    }
-
-    @Step("Return correct status code - 200")
-    public void return200Test(Response response) {
-        response.then().statusCode(200);
-    }
-
-    @Step("Get order return correct body")
-    public void returnOrderWithSameTrackBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("order.track", equalTo(trackId));
-    }
-
-    @Step("Deserialize order is not null")
-    public void getOrderReturnNotNullDeserializeTest(OrdersTrackResponse ordersResponse) {
-        OrdersTrackMainResponse order = ordersResponse.getOrder();
-        Allure.step("Order body: " + order.toString());
-        Assert.assertNotNull("Orders list is null", order);
+        statusCode.return200Test(response);
+        getOrder.returnOrderWithSameTrackBodyTest(response, trackId);
+        getOrder.getOrderTrackReturnNotNullDeserializeTest(orderResponse);
     }
 
     @Test
@@ -107,19 +76,8 @@ public class GetOrderTrackTest {
     @Description("Create order. Failed get order without track id, query parameter - t. GET \"/api/v1/orders/track\"")
     public void getOrderWithoutTrackIdTest() {
         response = orderSteps.getOrderWithoutTrack();
-        return400Test(response);
-        returnNotEnoughDataBodyTest(response);
-    }
-
-    @Step("Return correct status code - 400")
-    public void return400Test(Response response) {
-        response.then().statusCode(400);
-    }
-
-    @Step("Get order return correct body - \"message\":  \"Недостаточно данных для поиска\"")
-    public void returnNotEnoughDataBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo(GET_ORDER_TRACK_ID_NOT_ENOUGH_DATA_ERROR));
+        statusCode.return400Test(response);
+        body.returnNotEnoughDataBodyTest(response);
     }
 
     @Test
@@ -127,19 +85,8 @@ public class GetOrderTrackTest {
     @Description("Create order. Failed get order with wrong track id, query parameter - t. GET \"/api/v1/orders/track\"")
     public void getOrderWithWrongTrackIdTest() {
         response = orderSteps.getOrderWithTrack(trackId + trackId);
-        return404Test(response);
-        returnOrderNotFoundBodyTest(response);
-    }
-
-    @Step("Return correct status code - 404")
-    public void return404Test(Response response) {
-        response.then().statusCode(404);
-    }
-
-    @Step("Get order return correct body - \"message\": \"Заказ не найден\"")
-    public void returnOrderNotFoundBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo(GET_ORDER_TRACK_ID_NOT_FOUND_ERROR));
+        statusCode.return404Test(response);
+        body.returnOrderNotFoundBodyTest(response);
     }
 
     @After

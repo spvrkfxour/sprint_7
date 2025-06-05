@@ -1,22 +1,25 @@
 package ru.yandex.practicum;
 
-import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
+import ru.yandex.practicum.steps.BodySteps;
 import ru.yandex.practicum.steps.CourierSteps;
 import org.junit.Test;
+import ru.yandex.practicum.steps.CreateCourierSteps;
+import ru.yandex.practicum.steps.StatusCodeSteps;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static ru.yandex.practicum.steps.env.EnvConf.*;
 
 
 public class CreateCourierTest {
     private final CourierSteps courierSteps = new CourierSteps();
+    private final StatusCodeSteps statusCode = new StatusCodeSteps();
+    private final CreateCourierSteps createCourier = new CreateCourierSteps();
+    private final BodySteps body = new BodySteps();
     private String login;
     private String password;
     private String firstName;
@@ -33,27 +36,9 @@ public class CreateCourierTest {
     @DisplayName("Create courier with all valid parameters")
     @Description("Success create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithValidParametersTest() {
-        Response response = createCourierTest(login, password, firstName);
-        return201Test(response);
-        returnOkTrueBodyTest(response);
-    }
-
-    @Step("Create courier")
-    public Response createCourierTest(String login, String password, String firstName) {
-        Response response = courierSteps.createCourier(login, password, firstName, false);
-        Allure.step("Response Body: " + response.getBody().asString());
-        return response;
-    }
-
-    @Step("Return correct status code - 201")
-    public void return201Test(Response response) {
-        response.then().statusCode(201);
-    }
-
-    @Step("Create courier return correct body - { ok: true }")
-    public void returnOkTrueBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("ok", equalTo(true));
+        Response response = createCourier.createCourierResponseTest(login, password, firstName);
+        statusCode.return201Test(response);
+        body.returnOkTrueBodyTest(response);
     }
 
     @Test
@@ -61,93 +46,66 @@ public class CreateCourierTest {
     @Description("Failed create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Create another courier with same login")
     public void createCourierWithAlreadyCreatedLoginTest() {
-        createCourierTest(login, password, firstName);
-        Response response = createCourierTest(login,
+        createCourier.createCourierResponseTest(login, password, firstName);
+        Response response = createCourier.createCourierResponseTest(login,
                 RandomStringUtils.randomAlphanumeric((int)(Math.random() * 8) + 3),
                 RandomStringUtils.randomAlphabetic((int)(Math.random() * 8) + 3));
-        return409Test(response);
-        createCourierReturnAlreadyUseBodyTest(response);
-    }
-
-    @Step("Return correct status code - 409")
-    public void return409Test(Response response) {
-        response.then().statusCode(409);
-    }
-
-    @Step("Create courier return correct body - { \"message\": \"Этот логин уже используется\" }")
-    public void createCourierReturnAlreadyUseBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo(LOGIN_ALREADY_USE_ERROR));
+        statusCode.return409Test(response);
+        body.createCourierReturnAlreadyUseBodyTest(response);
     }
 
     @Test
     @DisplayName("Create courier with login = null")
     @Description("Failed create courier with login = null and random password and firstName parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithLoginNullTest() {
-        Response response = createCourierTest(null, password, firstName);
-        return400Test(response);
-        createCourierReturnNotEnoughDataBodyTest(response);
-    }
-
-    @Step("Return correct status code - 400")
-    public void return400Test(Response response) {
-        response.then().statusCode(400);
-    }
-
-    @Step("Create courier return correct body - { \"message\": \"Недостаточно данных для создания учетной записи\" }")
-    public void createCourierReturnNotEnoughDataBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo(CREATE_COURIER_NOT_ENOUGH_DATA_ERROR));
+        Response response = createCourier.createCourierResponseTest(null, password, firstName);
+        statusCode.return400Test(response);
+        body.createCourierReturnNotEnoughDataBodyTest(response);
     }
 
     @Test
     @DisplayName("Create courier with password = null")
     @Description("Failed create courier with password = null and random login and firstName parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithPasswordNullTest() {
-        Response response = createCourierTest(login, null, firstName);
-        return400Test(response);
-        createCourierReturnNotEnoughDataBodyTest(response);
+        Response response = createCourier.createCourierResponseTest(login, null, firstName);
+        statusCode.return400Test(response);
+        body.createCourierReturnNotEnoughDataBodyTest(response);
     }
 
     @Test
     @DisplayName("Create courier with firstName = null")
     @Description("Success create courier with firstName = null and random login and password parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithFirstNameNullTest() {
-        Response response = createCourierTest(login, password, null);
-        return201Test(response);
-        returnOkTrueBodyTest(response);
+        Response response = createCourier.createCourierResponseTest(login, password, null);
+        statusCode.return201Test(response);
+        body.returnOkTrueBodyTest(response);
     }
 
     @Test
     @DisplayName("Create courier without login")
     @Description("Failed create courier without login and random password and firstName parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithoutLoginTest() {
-        Response response = createCourierWithoutParameterTest(null, password, firstName);
-        return400Test(response);
-        createCourierReturnNotEnoughDataBodyTest(response);
-    }
-
-    @Step("Create courier")
-    public Response createCourierWithoutParameterTest(String login, String password, String firstName) {
-        return courierSteps.createCourier(login, password, firstName, true);
+        Response response = createCourier.createCourierWithoutParameterResponseTest(null, password, firstName);
+        statusCode.return400Test(response);
+        body.createCourierReturnNotEnoughDataBodyTest(response);
     }
 
     @Test
     @DisplayName("Create courier without password")
     @Description("Failed create courier without password and random login and firstName parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithoutPasswordTest() {
-        Response response = createCourierWithoutParameterTest(login, null, firstName);
-        return400Test(response);
-        createCourierReturnNotEnoughDataBodyTest(response);
+        Response response = createCourier.createCourierWithoutParameterResponseTest(login, null, firstName);
+        statusCode.return400Test(response);
+        body.createCourierReturnNotEnoughDataBodyTest(response);
     }
 
     @Test
     @DisplayName("Create courier without firstName")
     @Description("Success create courier without firstName and random login and password parameters (3-10 char). POST \"/api/v1/courier\"")
     public void createCourierWithoutFirstNameTest() {
-        Response response = createCourierWithoutParameterTest(login, password, null);
-        return201Test(response);
-        returnOkTrueBodyTest(response);
+        Response response = createCourier.createCourierWithoutParameterResponseTest(login, password, null);
+        statusCode.return201Test(response);
+        body.returnOkTrueBodyTest(response);
     }
 
     @After

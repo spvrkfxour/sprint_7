@@ -1,28 +1,29 @@
 package ru.yandex.practicum;
 
-import io.qameta.allure.Allure;
 import io.qameta.allure.Description;
-import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import ru.yandex.practicum.steps.CreateOrderSteps;
 import ru.yandex.practicum.steps.OrderSteps;
+import ru.yandex.practicum.steps.StatusCodeSteps;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static ru.yandex.practicum.steps.env.EnvConf.*;
 
 
 @RunWith(Parameterized.class)
 public class CreateOrderTest {
     private final OrderSteps orderSteps = new OrderSteps();
+    private final StatusCodeSteps statusCode = new StatusCodeSteps();
+    private final CreateOrderSteps createOrder = new CreateOrderSteps();
     private final String firstName;
     private final String lastName;
     private final String address;
@@ -79,27 +80,10 @@ public class CreateOrderTest {
     @DisplayName("Create order with different colors")
     @Description("Success create order with valid parameters from csv. POST \"/api/v1/orders\". Color parameter test only")
     public void createOrderTest() {
-        Response response = createOrderTest(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
+        Response response = createOrder.createOrderTest(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
         track = response.then().extract().path("track");
-        return201Test(response);
-        createOrderReturnTrackBodyTest(response);
-    }
-
-    @Step("Create order")
-    public Response createOrderTest(String firstName, String lastName, String address, int metroStation, String phone,
-                                int rentTime, String deliveryDate, String comment, List<String> color) {
-        return orderSteps.createOrder(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-    }
-
-    @Step("Return correct status code - 201")
-    public void return201Test(Response response) {
-        response.then().statusCode(201);
-    }
-
-    @Step("Create courier body return track id")
-    public void createOrderReturnTrackBodyTest(Response response) {
-        Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("track", notNullValue());
+        statusCode.return201Test(response);
+        createOrder.createOrderReturnTrackBodyTest(response);
     }
 
     @After
