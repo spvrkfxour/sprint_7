@@ -20,8 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static ru.yandex.practicum.steps.env.EnvConf.MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT;
-import static ru.yandex.practicum.steps.env.EnvConf.ORDERS_ORDER_TEST_DATA;
+import static ru.yandex.practicum.steps.env.EnvConf.*;
 
 
 public class AcceptOrderTest {
@@ -146,7 +145,7 @@ public class AcceptOrderTest {
     @Step("Accept order return correct body - \"message\": \"Недостаточно данных для поиска\"")
     public void returnNotEnoughDataBodyTest(Response response) {
         Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo("Недостаточно данных для поиска"));
+        response.then().body("message", equalTo(ACCEPT_ORDER_NOT_ENOUGH_DATA_ERROR));
     }
 
     @Test
@@ -167,7 +166,7 @@ public class AcceptOrderTest {
     @Step("Accept order return correct body - \"message\": \"Курьера с таким id не существует\"")
     public void returnCourierIdNotFoundBodyTest(Response response) {
         Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo("Курьера с таким id не существует"));
+        response.then().body("message", equalTo(ACCEPT_COURIER_ID_NOT_FOUND_ERROR));
     }
 
     @Test
@@ -176,7 +175,7 @@ public class AcceptOrderTest {
             "Failed accept order without order id path parameter. PUT \"/api/v1/orders/accept/{id}\"")
     public void acceptOrderWithoutOrderIdTest() {
         Response response = orderSteps.acceptOrderWithoutOrderId(courierId);
-        return400Test(response);
+        return404Test(response);
         returnNotEnoughDataBodyTest(response);
     }
 
@@ -193,7 +192,7 @@ public class AcceptOrderTest {
     @Step("Accept order return correct body - \"message\": \"Заказа с таким id не существует\"")
     public void returnOrderIdNotFoundBodyTest(Response response) {
         Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo("Заказа с таким id не существует"));
+        response.then().body("message", equalTo(ACCEPT_ORDER_ID_NOT_FOUND_ERROR));
     }
 
     @After

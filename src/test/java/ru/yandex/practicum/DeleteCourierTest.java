@@ -85,13 +85,8 @@ public class DeleteCourierTest {
     public void deleteCourierWithoutIdTest() {
         createCourierTest(login, password, firstName);
         Response response = courierSteps.deleteCourierWithoutId();
-        return400Test(response);
+        return404Test(response);
         deleteCourierReturnNotEnoughDataBodyTest(response);
-    }
-
-    @Step("Return correct status code - 400")
-    public void return400Test(Response response) {
-        response.then().statusCode(400);
     }
 
     @Step("Delete courier without id return correct body - { \"message\":  \"Недостаточно данных для удаления курьера\" }")

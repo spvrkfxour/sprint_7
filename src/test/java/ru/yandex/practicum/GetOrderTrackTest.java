@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static ru.yandex.practicum.steps.env.EnvConf.ORDERS_ORDER_TEST_DATA;
+import static ru.yandex.practicum.steps.env.EnvConf.*;
 
 
 public class GetOrderTrackTest {
@@ -119,7 +119,7 @@ public class GetOrderTrackTest {
     @Step("Get order return correct body - \"message\":  \"Недостаточно данных для поиска\"")
     public void returnNotEnoughDataBodyTest(Response response) {
         Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo("Недостаточно данных для поиска"));
+        response.then().body("message", equalTo(GET_ORDER_TRACK_ID_NOT_ENOUGH_DATA_ERROR));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class GetOrderTrackTest {
     @Step("Get order return correct body - \"message\": \"Заказ не найден\"")
     public void returnOrderNotFoundBodyTest(Response response) {
         Allure.step("Response Body: " + response.getBody().asString());
-        response.then().body("message", equalTo("Заказ не найден"));
+        response.then().body("message", equalTo(GET_ORDER_TRACK_ID_NOT_FOUND_ERROR));
     }
 
     @After
