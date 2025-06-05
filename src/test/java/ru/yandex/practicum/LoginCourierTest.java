@@ -10,6 +10,8 @@ import org.junit.Rule;
 import org.junit.rules.Timeout;
 import ru.yandex.practicum.steps.*;
 import org.junit.Test;
+import ru.yandex.practicum.steps.dto.CreateCourierRequest;
+import ru.yandex.practicum.steps.dto.CreateCourierRequestWithoutParameters;
 
 import static ru.yandex.practicum.steps.env.EnvConf.*;
 
@@ -23,6 +25,8 @@ public class LoginCourierTest {
     private String login;
     private String password;
     private String firstName;
+    private CreateCourierRequest courier;
+    private CreateCourierRequestWithoutParameters courierNull;
 
     @Before
     public void setUp() {
@@ -40,7 +44,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Success login courier with created courier parameters. POST \"/api/v1/courier/login\"")
     public void loginCourierTest() {
-        createCourier.createCourierTest(login, password, firstName);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
         Response response = loginCourier.loginCourierTest(login, password);
         statusCode.return200Test(response);
         loginCourier.loginCourierReturnNotNullBodyTest(response);
@@ -51,7 +56,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Failed login courier with created courier parameters and login = null. POST \"/api/v1/courier/login\"")
     public void loginCourierWithNullLoginTest() {
-        createCourier.createCourierTest(login, password, firstName);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
         Response response = loginCourier.loginCourierTest(null, password);
         statusCode.return400Test(response);
         body.loginCourierReturnNotEnoughDataBodyTest(response);
@@ -62,7 +68,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Failed login courier with created courier parameters and password = null. POST \"/api/v1/courier/login\"")
     public void loginCourierWithNullPasswordTest() {
-        createCourier.createCourierTest(login, password, firstName);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
         Response response = loginCourier.loginCourierTest(login, null);
         statusCode.return400Test(response);
         body.loginCourierReturnNotEnoughDataBodyTest(response);
@@ -73,7 +80,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Failed login courier with created courier password and without login. POST \"/api/v1/courier/login\"")
     public void loginCourierWithoutLoginTest() {
-        createCourier.createCourierWithoutParameterTest(login, password, firstName);
+        courierNull = new CreateCourierRequestWithoutParameters(login, password, firstName);
+        createCourier.createCourierWithoutParameterTest(courierNull);
         Response response = loginCourier.loginCourierWithoutParametersTest(null, password);
         statusCode.return400Test(response);
         body.loginCourierReturnNotEnoughDataBodyTest(response);
@@ -84,7 +92,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Failed login courier with created courier login and without password. POST \"/api/v1/courier/login\"")
     public void loginCourierWithoutPasswordTest() {
-        createCourier.createCourierWithoutParameterTest(login, password, firstName);
+        courierNull = new CreateCourierRequestWithoutParameters(login, password, firstName);
+        createCourier.createCourierWithoutParameterTest(null);
         Response response = loginCourier.loginCourierWithoutParametersTest(login, null);
         statusCode.return400Test(response);
         body.loginCourierReturnNotEnoughDataBodyTest(response);
@@ -95,7 +104,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Failed login courier with wrong login. POST \"/api/v1/courier/login\"")
     public void loginCourierWithWrongLoginTest() {
-        createCourier.createCourierTest(login, password, firstName);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
         Response response = loginCourier.loginCourierTest(login + "t", password);
         statusCode.return404Test(response);
         body.loginCourierReturnNotFoundDataBodyTest(response);
@@ -106,7 +116,8 @@ public class LoginCourierTest {
     @Description("Create courier with random login, password and firstName parameters (3-10 char). POST \"/api/v1/courier\"." +
             " Failed login courier with wrong password. POST \"/api/v1/courier/login\"")
     public void loginCourierWithWrongPasswordTest() {
-        createCourier.createCourierTest(login, password, firstName);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
         Response response = loginCourier.loginCourierTest(login, password + "t");
         statusCode.return404Test(response);
         body.loginCourierReturnNotFoundDataBodyTest(response);

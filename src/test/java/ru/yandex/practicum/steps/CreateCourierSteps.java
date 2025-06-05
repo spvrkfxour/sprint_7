@@ -3,31 +3,33 @@ package ru.yandex.practicum.steps;
 import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import ru.yandex.practicum.steps.dto.CreateCourierRequest;
+import ru.yandex.practicum.steps.dto.CreateCourierRequestWithoutParameters;
 
 
 public class CreateCourierSteps {
     private final CourierSteps courierSteps = new CourierSteps();
 
     @Step("Create courier")
-    public void createCourierTest(String login, String password, String firstName) {
-        Response response = courierSteps.createCourier(login, password, firstName, false);
+    public void createCourierTest(CreateCourierRequest courier) {
+        Response response = courierSteps.createCourier(courier);
         Allure.step("Response Body: " + response.getBody().asString());
     }
 
     @Step("Create courier")
-    public Response createCourierResponseTest(String login, String password, String firstName) {
-        Response response = courierSteps.createCourier(login, password, firstName, false);
+    public Response createCourierResponseTest(CreateCourierRequest courier) {
+        Response response = courierSteps.createCourier(courier);
         Allure.step("Response Body: " + response.getBody().asString());
         return response;
     }
 
     @Step("Create courier")
-    public void createCourierWithoutParameterTest(String login, String password, String firstName) {
-        courierSteps.createCourier(login, password, firstName, true);
+    public void createCourierWithoutParameterTest(CreateCourierRequestWithoutParameters courierNull) {
+        courierSteps.createCourierWithoutParameters(courierNull);
     }
 
     @Step("Create courier")
-    public Response createCourierWithoutParameterResponseTest(String login, String password, String firstName) {
-        return courierSteps.createCourier(login, password, firstName, true);
+    public Response createCourierWithoutParameterResponseTest(CreateCourierRequestWithoutParameters courierNull) {
+        return courierSteps.createCourierWithoutParameters(courierNull);
     }
 }

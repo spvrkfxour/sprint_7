@@ -8,6 +8,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.practicum.steps.*;
+import ru.yandex.practicum.steps.dto.CreateCourierRequest;
+import ru.yandex.practicum.steps.dto.CreateCourierRequestWithoutParameters;
 import ru.yandex.practicum.steps.dto.OrdersTrackResponse;
 
 import java.io.IOException;
@@ -37,6 +39,8 @@ public class AcceptOrderTest {
     private Integer trackId;
     private Integer courierId;
     private Integer orderId;
+    private CreateCourierRequest courier;
+    private CreateCourierRequestWithoutParameters courierNull;
 
     private static String[] orderData() {
         try {
@@ -69,7 +73,8 @@ public class AcceptOrderTest {
         login = RandomStringUtils.randomAlphabetic((int)(Math.random() * 8) + MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT);
         password = RandomStringUtils.randomAlphanumeric((int)(Math.random() * 8) + MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT);
         firstName = RandomStringUtils.randomAlphabetic((int)(Math.random() * 8) + MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT);
-        createCourier.createCourierTest(login, password, firstName);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
         trackId = getOrder.getTrackIdTest(responseOrder);
         courierId = getCourier.getCourierIdTest(login, password);
         response = orderSteps.getOrderWithTrack(trackId);

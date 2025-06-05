@@ -11,19 +11,22 @@ import static ru.yandex.practicum.steps.env.EnvConf.*;
 
 public class CourierSteps {
 
-    public Response createCourier(String login, String password, String firstName, boolean withoutParameters) {
-        Object courier;
-
-        if (withoutParameters) {
-            courier = new CreateCourierRequestWithoutParameters(login, password, firstName);
-        } else {
-            courier = new CreateCourierRequest(login, password, firstName);
-        }
+    public Response createCourier(CreateCourierRequest courier) {
 
         return given()
                 .contentType(ContentType.JSON)
                 .baseUri(URL)
                 .body(courier)
+                .when()
+                .post(CREATE_COURIER_ENDPOINT);
+    }
+
+    public Response createCourierWithoutParameters(CreateCourierRequestWithoutParameters courierNull) {
+
+        return given()
+                .contentType(ContentType.JSON)
+                .baseUri(URL)
+                .body(courierNull)
                 .when()
                 .post(CREATE_COURIER_ENDPOINT);
     }

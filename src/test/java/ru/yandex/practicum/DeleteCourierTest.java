@@ -11,6 +11,7 @@ import ru.yandex.practicum.steps.CourierSteps;
 import org.junit.Test;
 import ru.yandex.practicum.steps.CreateCourierSteps;
 import ru.yandex.practicum.steps.StatusCodeSteps;
+import ru.yandex.practicum.steps.dto.CreateCourierRequest;
 
 import static ru.yandex.practicum.steps.env.EnvConf.*;
 
@@ -23,6 +24,7 @@ public class DeleteCourierTest {
     private String login;
     private String password;
     private String firstName;
+    private CreateCourierRequest courier;
 
     @Before
     public void setUp() {
@@ -30,13 +32,14 @@ public class DeleteCourierTest {
         login = RandomStringUtils.randomAlphabetic((int)(Math.random() * 8) + MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT);
         password = RandomStringUtils.randomAlphanumeric((int)(Math.random() * 8) + MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT);
         firstName = RandomStringUtils.randomAlphabetic((int)(Math.random() * 8) + MIN_COUNT_RANDOM_LENGTH_FOR_SHORT_TEXT);
+        courier = new CreateCourierRequest(login, password, firstName);
+        createCourier.createCourierTest(courier);
     }
 
     @Test
     @DisplayName("Delete courier with valid id")
     @Description("Success delete courier with valid id in request. DELETE \"/api/v1/courier/{id}\"")
     public void deleteCourierTest() {
-        createCourier.createCourierTest(login, password, firstName);
         Integer id = courierSteps.loginCourier(login, password, false).then().extract().path("id");
         Response response = courierSteps.deleteCourier(id);
         statusCode.return200Test(response);
@@ -47,7 +50,6 @@ public class DeleteCourierTest {
     @DisplayName("Delete courier with nonexistent id")
     @Description("Failed delete courier with nonexistent id in request. DELETE \"/api/v1/courier/{id}\"")
     public void deleteCourierWithNonexistentIdTest() {
-        createCourier.createCourierTest(login, password, firstName);
         Integer id = courierSteps.loginCourier(login, password, false).then().extract().path("id");
         Response response = courierSteps.deleteCourier(id + id);
         statusCode.return404Test(response);
@@ -58,7 +60,6 @@ public class DeleteCourierTest {
     @DisplayName("Delete courier without id")
     @Description("Failed delete courier without id params in request. DELETE \"/api/v1/courier/{id}\"")
     public void deleteCourierWithoutIdTest() {
-        createCourier.createCourierTest(login, password, firstName);
         Response response = courierSteps.deleteCourierWithoutId();
         statusCode.return404Test(response);
         body.deleteCourierReturnNotEnoughDataBodyTest(response);
